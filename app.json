@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "HECTMAP",
+    "slug": "HECTMAP",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Precisamos da sua localização para mostrar no mapa"
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "permissions": ["ACCESS_FINE_LOCATION"],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
