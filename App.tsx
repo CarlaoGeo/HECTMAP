@@ -14,9 +14,11 @@ function HomeScreen({ navigation }: any) {
     <View style={styles.container}>
       <Image
         source={require("./assets/logo.png")}
+        
         style={styles.logo}
         resizeMode="contain"
       />
+      
 
       <TouchableOpacity
         style={styles.button}
@@ -73,3 +75,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+

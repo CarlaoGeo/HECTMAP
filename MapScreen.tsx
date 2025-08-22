@@ -53,7 +53,24 @@ export default function MapScreen() {
               }
             }
           },
-          { text: "OK" }
+          { text: "salvar no dispositivo",
+            onPress: async () => {
+              const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+              if (!permissions.granted) {
+                Alert.alert("Permissão negada", "Você precisa conceder permissão para salvar o arquivo.");
+                return;
+              }
+              else {
+                const MimeType = filename.includes('.kml') ? 'application/vnd.google-earth.kml+xml' : 'text/plain';
+                await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, filename,MimeType)
+                .then(async (newUri) => {
+                  await FileSystem.writeAsStringAsync(newUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+                });
+                Alert.alert("Arquivo salvo", `Arquivo salvo em: ${fileUri}`);
+              }
+              
+            }
+           }
         ]
       );
     } catch (e) {
@@ -70,6 +87,8 @@ export default function MapScreen() {
         geolocationEnabled={true}
         injectedJavaScript={injectedJS}
         onMessage={handleMessage}
+        allowFileAccess={true}
+        allowUniversalAccessFromFileURLs={true}
         style={{ flex: 1 }}
       />
     </View>

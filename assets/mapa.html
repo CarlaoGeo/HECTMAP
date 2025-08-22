@@ -8,7 +8,18 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
-<link rel="stylesheet" href="syles.css" />
+<style>
+    html, body, #map { height: 100%; margin: 0; padding: 0; }
+    #canvas { position: absolute; top:0; left:0; z-index:1000; pointer-events: none; }
+    .btn { position:absolute; top:10px; background:rgb(190, 188, 188); padding:8px 10px; border-radius:6px; border:1px solid #999; cursor:pointer; font-family:sans-serif; z-index:2000; }
+    #btnDraw { top: 40px; right: 20px; }
+    #btnClear { top: 100px; right: 20px; }
+    #btnSave { top: 160px; right: 20px; }
+    #btnLoadKML { top: 220px; right: 20px; }
+    #btnKMLConfig { top: 280px; right: 20px; }
+    #info { position:absolute; top:80px; left:20px; background:rgb(190, 190, 190); padding:10px 15px; border-radius:8px; font-family:Arial,sans-serif; font-size:16px; z-index:2000; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+    #kmlConfigPanel { display:none; position:absolute; top:315px; right:20px; background:white; padding:10px; border-radius:8px; z-index:3000; box-shadow:0 2px 5px rgba(0,0,0,0.3);}
+</style>
 </head>
 <body>
 <div id="map"></div>
@@ -41,7 +52,7 @@
   <div style="background:#fff; padding:20px 30px; border-radius:10px; box-shadow:0 2px 8px #0008; min-width:220px;">
     <label for="formatSelect"><b>Escolha o formato para salvar:</b></label><br>
     <select id="formatSelect" style="margin:10px 0; width:100%;">
-      <option value="geojson">GeoJSON</option>
+      
       <option value="kml">KML</option>
     </select>
     <div style="text-align:right;">
@@ -200,11 +211,29 @@ btnLoadKML.addEventListener('click', function() {
 inputLoadKML.addEventListener('change', function(event) {
     var file = event.target.files[0];
     if(!file) return;
+
     var reader = new FileReader();
-    reader.onload = function(e){
+    reader.onload = function(e) {
         var text = e.target.result;
+
+        // Remove camada anterior
         if(currentKMLLayer) map.removeLayer(currentKMLLayer);
-        currentKMLLayer = omnivore.kml.parse(text).addTo(map);
+
+        // Detecta tipo do arquivo pelo nome
+        var filename = file.name.toLowerCase();
+
+        if(filename.endsWith('.kml')) {
+            currentKMLLayer = omnivore.kml.parse(text).addTo(map);
+        } else if(filename.endsWith('.geojson') || filename.endsWith('.json')) {
+            var geojsonData = JSON.parse(text);
+            currentKMLLayer = L.geoJSON(geojsonData, {
+                style: { color: strokeColorInput.value, fillColor: fillColorInput.value, fillOpacity: 0.5 }
+            }).addTo(map);
+        } else {
+            alert("Formato não suportado. Use KML ou GeoJSON.");
+            return;
+        }
+
         map.fitBounds(currentKMLLayer.getBounds());
         btnKMLConfig.style.display = "block";
     };
