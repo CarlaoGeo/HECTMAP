@@ -111,6 +111,9 @@ btnClear.onclick = function(){
     drawnLayer.clearLayers();
     ctx.clearRect(0,0,canvas.width,canvas.height);
     info.textContent="Área: 0 ha";
+    polygonsCount = 0;
+    polygonsCount = 0;
+    areas = [];
 };
 
 btnSave.onclick = function() {
@@ -177,7 +180,7 @@ function endDrawing(e){
     // mostra lista com áreas de cada polígono
     let infoText = "Polígonos desenhados: " + polygonsCount + "<br>";
     areas.forEach((a,i)=>{ infoText += "Polígono " + (i+1) + ": " + a + " ha<br>"; });
-    infoText += "Área total: " + areas.reduce((sum, a) => sum + parseFloat(a), 0).toFixed(2) + " ha";5
+    infoText += "Área total: " + areas.reduce((sum, a) => sum + parseFloat(a), 0).toFixed(2) + " ha";
     info.innerHTML = infoText;
 
     ctx.clearRect(0,0,canvas.width,canvas.height); // limpa canvas
@@ -263,23 +266,7 @@ applyBtn.onclick = function(){
 };
 
 // GPS em tempo real
-var gpsMarker = null;
-if(navigator.geolocation){
-    navigator.geolocation.watchPosition(function(position){
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
-        if(!gpsMarker){
-            gpsMarker = L.marker([lat,lng]).addTo(map).bindPopup("Você está aqui").openPopup();
-        }else{
-            gpsMarker.setLatLng([lat,lng]);
-        }
-        map.setView([lat,lng],18);
-    }, function(error){
-        console.error("Erro ao obter localização: "+error.message);
-    }, { enableHighAccuracy:true, maximumAge:1000, timeout:5000 });
-}else{
-    alert("Geolocalização não suportada neste dispositivo.");
-}
+
 
 // Lógica do modal de formato
 var formatModal = document.getElementById('formatModal');
@@ -301,7 +288,7 @@ formatOk.onclick = function() {
         content = JSON.stringify(drawnLayer.toGeoJSON());
         filename = "desenho.geojson";
     } else if(format === "kml") {
-        let kmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n';
+        let kmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="https://www.opengis.net/kml/2.2">\n<Document>\n';
         drawnLayer.eachLayer(function(layer, index) {
             if(layer instanceof L.Polygon){
                 kmlContent += `<Placemark>\n<name>Polígono ${index+1}</name>\n<Polygon>\n<outerBoundaryIs>\n<LinearRing>\n<coordinates>\n`;
