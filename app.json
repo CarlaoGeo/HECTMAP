@@ -26,9 +26,14 @@
     "android": {
       "permissions": [
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
-      
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo_1024_1024.png",
         "backgroundColor": "#ffffff"
@@ -43,6 +48,13 @@
       "eas": {
         "projectId": "ac44dadb-180a-437d-882b-5c7b5c4e9c48"
       }
+    },
+    "owner": "carlaogeo",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ac44dadb-180a-437d-882b-5c7b5c4e9c48"
     }
   }
 }
