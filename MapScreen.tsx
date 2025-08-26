@@ -12,43 +12,50 @@ export default function MapScreen() {
   const [location, setLocation] = useState<LocationObjectCoords | null>(null);
   const webViewRef = useRef<WebView | null>(null);
 
+  // Função para buscar e injetar a localização no estado
+  const fetchAndInjectLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permissão de localização negada!");
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+      if (loc) {
+        console.log("Localização obtida com sucesso:", loc.coords);
+        setLocation(loc.coords);
+      } else {
+        console.log("Não foi possível obter a localização. Retornou nulo.");
+      }
+    } catch (error) {
+      console.log("Erro ao obter a localização:", error);
+      Alert.alert("Erro", "Não foi possível obter sua localização.");
+    }
+  };
+
+  // Efeito 1: Carrega o HTML e, em seguida, obtém a localização na montagem do componente.
+  // Isso faz com que o pin apareça na primeira vez que a tela é aberta.
   useEffect(() => {
-    const setupMap = async () => {
+    const setupMapAndLocation = async () => {
       try {
         const asset = Asset.fromModule(require("./assets/mapa.html"));
         await asset.downloadAsync();
         const fileUri = asset.localUri || asset.uri;
         const html = await FileSystem.readAsStringAsync(fileUri);
         setHtmlContent(html);
+        
+        // Chama a função para obter a localização imediatamente após o HTML ser carregado
+        await fetchAndInjectLocation();
+
       } catch (error) {
         console.error("Erro ao carregar HTML:", error);
         Alert.alert("Erro", "Não foi possível carregar o mapa.");
-        return;
-      }
-
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permissão de localização negada!");
-        return;
-      }
-      console.log("Permissão de localização concedida.");
-
-      try {
-        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-        if (loc) {
-          console.log("Localização obtida com sucesso:", loc.coords);
-          setLocation(loc.coords);
-        } else {
-          console.log("Não foi possível obter a localização. Retornou nulo.");
-        }
-      } catch (error) {
-        console.log("Erro ao obter a localização:", error);
-        Alert.alert("Erro", "Não foi possível obter sua localização.");
       }
     };
-    setupMap();
+    setupMapAndLocation();
   }, []);
 
+  // Efeito 2: Monitora a localização e injeta o JavaScript quando ela é atualizada.
   useEffect(() => {
     if (location && webViewRef.current) {
       const jsCode = `
@@ -84,10 +91,17 @@ export default function MapScreen() {
     }
   }, [location]);
 
-  // Use WebViewMessageEvent to type the event parameter
+  // Função que recebe as mensagens do WebView
   const handleMessage = async (event: WebViewMessageEvent) => {
+    const message = event.nativeEvent.data;
+
+    if (message === 'GET_LOCATION') {
+      await fetchAndInjectLocation(); // Re-utiliza a função para obter a localização
+      return; 
+    }
+
     try {
-      const { content, filename } = JSON.parse(event.nativeEvent.data);
+      const { content, filename } = JSON.parse(message);
       const fileUri = FileSystem.documentDirectory + filename;
       await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
       

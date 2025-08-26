@@ -3,7 +3,7 @@ import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
 import MapScreen from "./MapScreen"; // Importa o MapScreen
 
 const Stack = createStackNavigator();
@@ -35,7 +35,14 @@ function HomeScreen({ navigation }: any) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          
+          cardStyleInterpolator: CardStyleInterpolators.forFadeFromCenter, // fade
+        }}
+      >
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Map" component={MapScreen} />
       </Stack.Navigator>
