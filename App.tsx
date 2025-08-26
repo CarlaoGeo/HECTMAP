@@ -1,4 +1,4 @@
-// App.tsx
+// App.tsx teste
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
