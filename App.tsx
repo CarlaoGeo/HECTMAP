@@ -54,7 +54,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0066cc",
+    backgroundColor: "#ffffffff",
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    color: "#fff",
+    color: "#000000ff",
     fontWeight: "bold",
     marginBottom: 40,
   },
