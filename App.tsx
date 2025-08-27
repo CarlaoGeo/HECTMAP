@@ -54,7 +54,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffffff",
+    backgroundColor: "#00ffaaff",
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
@@ -71,13 +71,13 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   button: {
-    backgroundColor: "#fff",
+    backgroundColor: "#d9ff00ff",
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 10,
   },
   buttonText: {
-    color: "#0066cc",
+    color: "#eeeeeeff",
     fontSize: 18,
     fontWeight: "bold",
   },
