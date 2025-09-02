@@ -12,18 +12,40 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "android_app_id": "ca-app-pub-2863705568861851~8334182674",
+          "ios_app_id": "ca-app-pub-2863705568861851~8334182674"
+        }
+      ]
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.carlaogeo.HECTMAP"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo_1024_1024.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.carlaogeo.HECTMAP"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "owner": "carlaogeo",
+    "runtimeVersion": "1.1.0",
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/ac44dadb-180a-437d-882b-5c7b5c4e9c48"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ac44dadb-180a-437d-882b-5c7b5c4e9c48"
+      }
     }
   }
 }
