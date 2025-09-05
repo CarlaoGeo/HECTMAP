@@ -62,4 +62,4 @@ Podemos atualizar nossa Política de Privacidade de tempos em tempos. Notificare
 6. Fale Conosco
 Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco:
 
-Por e-mail: [Insira seu e-mail de contato para suporte]
+Por e-mail: carlosedulc17077@gmail.com
