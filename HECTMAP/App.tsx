@@ -1,65 +1,81 @@
 // App.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
-import MapScreen from "../HECTMAP/MapScreen";
-
-// Importe os componentes de anúncios
-import mobileAds, { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-
-// Use o ID de teste durante o desenvolvimento!
-const adUnitIdBanner = __DEV__ ? TestIds.BANNER : 'ca-app-pub-2863705568861851/6038928496';
+import MapScreen from "./MapScreen";
+import mobileAds, { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
 
 const Stack = createStackNavigator();
 
-// Tela inicial
 function HomeScreen({ navigation }: any) {
+  const [adsInitialized, setAdsInitialized] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    // Inicializa o SDK do Google Mobile Ads
+    mobileAds()
+      .initialize()
+      .then(adapterStatuses => {
+        console.log("SDK do Google Mobile Ads inicializado com sucesso!", adapterStatuses);
+        setAdsInitialized(true);
+        setShowBanner(true);
+      })
+      .catch(error => console.error("Falha ao inicializar o SDK de anúncios:", error));
+  }, []);
+
+  const handleAdFailed = (error: any) => {
+    console.log("Falha ao carregar banner:", error);
+    if (retryCount < 3) {
+      setRetryCount(retryCount + 1);
+      setTimeout(() => setShowBanner(true), 2000); // tenta novamente após 2s
+    }
+  };
+
   return (
-    // SafeAreaView garante que o conteúdo não fique sob a barra de status ou notch
     <SafeAreaView style={styles.container}>
-      {/* Container para o Anúncio Banner no Topo */}
-      <View style={styles.adContainer}>
-        <BannerAd
-          unitId={adUnitIdBanner}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{
-            requestNonPersonalizedAdsOnly: true, // Opcional: para conformidade com GDPR
-          }}
-        />
-      </View>
+      <View style={{ flex: 1 }}>
+        {/* Conteúdo central */}
+        <View style={styles.contentContainer}>
+          <Image
+            source={require("./assets/logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
 
-      <View style={styles.contentContainer}>
-        <Image
-          source={require("./assets/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Map")}
+          >
+            <Text style={styles.buttonText}>Abrir Mapa</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Map")}
-        >
-          <Text style={styles.buttonText}>Abrir Mapa</Text>
-        </TouchableOpacity>
+          <StatusBar style="auto" />
+        </View>
 
-        <StatusBar style="auto" />
+        {/* Banner fixo no final da tela */}
+        {adsInitialized && showBanner ? (
+          <BannerAd
+            unitId={TestIds.BANNER} // ID de teste
+            size={BannerAdSize.LARGE_BANNER}
+            requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+            onAdLoaded={() => console.log("Banner carregado com sucesso!")}
+            onAdFailedToLoad={handleAdFailed}
+          />
+        ) : (
+          // Placeholder quando o banner não carrega
+          <View style={styles.placeholderBanner}>
+            <Text style={{ color: "#008cffff" }}>CARREGANDO ANúNCIO</Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
 }
 
 export default function App() {
-  // Inicializa o SDK do Google Mobile Ads assim que o app abre
-  useEffect(() => {
-    mobileAds()
-      .initialize()
-      .then(adapterStatuses => {
-        console.log('SDK de anúncios inicializado!', adapterStatuses);
-      });
-  }, []);
-
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -79,16 +95,9 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#00ffaaff",
-  },
-  adContainer: {
-    // Container para o anúncio, alinhado no topo
-    alignItems: 'center',
-    width: '100%',
-    paddingTop: 10, // Um respiro no topo
+    backgroundColor: "#008cffff",
   },
   contentContainer: {
-    // O conteúdo original da sua tela
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -99,21 +108,24 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 20,
   },
-  title: {
-    fontSize: 28,
-    color: "#000000ff",
-    fontWeight: "bold",
-    marginBottom: 40,
-  },
   button: {
-    backgroundColor: "#00f7ffff",
+    backgroundColor: "#00ffddff",
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 10,
+    marginTop: 20,
   },
   buttonText: {
-    color: "#eeeeeeff",
+    color: "#000000ff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  placeholderBanner: {
+    width: 320,
+    height: 50,
+    backgroundColor: "#ccc",
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

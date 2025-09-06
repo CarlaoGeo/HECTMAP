@@ -9,15 +9,162 @@
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
 <style>
-html, body, #map { height: 100%; margin: 0; padding: 0; }
-#canvas { position: absolute; top:0; left:0; z-index:1000; pointer-events: none; }
-.btn { background:rgb(190, 188, 188); padding:8px 10px; border-radius:6px; border:1px solid #999; cursor:pointer; font-family:sans-serif; z-index:2000; }
-#info { position:absolute; top:80px; left:20px; background:rgb(190, 190, 190); padding:10px 15px; border-radius:8px; font-family:Arial,sans-serif; font-size:16px; z-index:2000; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-#kmlConfigPanel { display:none; position:absolute; top:315px; right:20px; background:white; padding:10px; border-radius:8px; z-index:3000; box-shadow:0 2px 5px rgba(0,0,0,0.3); }
-#btnMenu { position:absolute; top:30px; right:20px; }
-#dropdownMenu { display:none; position:absolute; top:75px; right:20px; background:rgb(190,188,188); border-radius:6px; padding:5px; z-index:2000; }
-#dropdownMenu .btn { display:block; position:relative; margin:5px 0; width:120px; text-align:center; }
-#btnGps { position:absolute; top:80px; right:20px; z-index: 1000; }
+html, body, #map {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+}
+
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1500; /* acima do mapa, abaixo de menus */
+    pointer-events: none;
+}
+
+.btn {
+    background-color: #e0e0e0;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+    z-index: 2000;
+}
+
+.btn:hover {
+    background-color: #d5d5d5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#info {
+    position: absolute;
+    top: 80px;
+    left: 20px;
+    background: #f0f0f0;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #222;
+    z-index: 2000;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+}
+
+#btnMenu {
+    position: absolute;
+    top: 30px;
+    right: 20px;
+}
+
+#dropdownMenu {
+    position: absolute;
+    top: 75px;
+    right: 20px;
+    background: #e0e0e0;
+    border-radius: 12px;
+    padding: 10px;
+    z-index: 2000;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: all 0.25s ease;
+}
+
+#dropdownMenu.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#dropdownMenu .btn {
+    display: block;
+    margin: 8px 0;
+    width: 140px;
+    text-align: center;
+}
+
+#btnGps {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Painel KML */
+#kmlConfigPanel {
+    display: none;
+    position: absolute;
+    top: 200px;
+    right: 20px;
+    background: #ffffff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    z-index: 3000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+#kmlConfigPanel .btn, #kmlConfigPanel input[type=color], #kmlConfigPanel input[type=checkbox] {
+    margin: 6px 0;
+}
+
+/* Modal personalizado */
+.custom-modal {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6000;
+}
+
+.custom-modal-content {
+    background: #dcdcdc;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    min-width: 250px;
+    text-align: center;
+}
+
+.custom-modal button {
+    background: #bfbfbf;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.custom-modal input {
+    width: 80%;
+    padding: 5px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid #999;
+    font-weight: bold;
+}
+
+.leaflet-control-attribution {
+    font-size: 5px !important; /* Tamanho da fonte menor */
+    background: rgba(255, 255, 255, 0.5) !important; /* Fundo um pouco transparente */
+}
 </style>
 </head>
 <body>
@@ -34,43 +181,53 @@ html, body, #map { height: 100%; margin: 0; padding: 0; }
     <div id="btnDraw" class="btn">✏️ Desenhar</div>
     <div id="btnClear" class="btn">🗑️ Limpar</div>
     <div id="btnSave" class="btn">💾 Salvar</div>
-    <button id="btnLoadKML" class="btn">📂 Carregar KML</button>
-    <div id="btnKMLConfig" class="btn" style="display:none;">⚙️ Config KML</div>
+    <button id="btnLoadKML" class="btn">📂 Carregar Arquivo</button>
+    <div id="btnKMLConfig" class="btn" style="display:none;">⚙️ Configurar Camada</div>
 </div>
 
-<!-- Botão GPS separado -->
+<!-- Botão GPS -->
 <button id="btnGps" class="btn">📍</button>
 
-<input type="file" id="inputLoadKML" accept=".kml" style="display:none;" />
+<input type="file" id="inputLoadKML" accept=".kml,.geojson,.json" style="display:none;" />
 
 <div id="kmlConfigPanel">
-    <label for="strokeColor">Cor do contorno:</label>
-    <input type="color" id="strokeColor" value="#ff0000"><br><br>
-    <label for="fillColor">Cor do preenchimento:</label>
-    <input type="color" id="fillColor" value="#ff0000"><br><br>
-    <label><input type="checkbox" id="noFill"> Sem preenchimento</label><br><br>
-    <button id="applyKMLStyle">Aplicar</button>
-    <button id="btnDeleteKML" style="margin-top:10px;">❌ Excluir KML</button>
+    <label>Cor do contorno:</label>
+    <input type="color" id="strokeColor" value="#ff0000"><br>
+    <label>Cor do preenchimento:</label>
+    <input type="color" id="fillColor" value="#ff0000"><br>
+    <label><input type="checkbox" id="noFill"> Sem preenchimento</label><br>
+    <button id="applyKMLStyle" class="btn">Aplicar</button>
+    <button id="btnDeleteKML" class="btn">❌ Excluir Camada</button>
 </div>
 
-<!-- Modal de seleção de formato -->
+<!-- Modal salvar -->
 <div id="formatModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:5000; align-items:center; justify-content:center;">
   <div style="background:#fff; padding:20px 30px; border-radius:10px; box-shadow:0 2px 8px #0008; min-width:220px;">
     <label for="formatSelect"><b>Escolha o formato para salvar:</b></label><br>
-    <select id="formatSelect" style="margin:10px 0; width:100%;">
+    <select id="formatSelect" style="margin:10px 0; padding: 5px; width:100%; border-radius: 5px;">
       <option value="kml">KML</option>
+      <option value="geojson">GeoJSON</option>
+      <option value="csv">CSV (Coordenadas)</option>
     </select>
-    <div style="text-align:right;">
-      <button id="formatCancel" style="margin-right:10px;">Cancelar</button>
-      <button id="formatOk">Salvar</button>
+    <div style="text-align:right; margin-top: 15px;">
+      <button id="formatCancel" style="margin-right:10px; padding: 8px 12px; border-radius: 5px; border: 1px solid #ccc; cursor:pointer;">Cancelar</button>
+      <button id="formatOk" style="padding: 8px 12px; border-radius: 5px; border: none; background-color: #4CAF50; color: white; cursor:pointer;">Salvar</button>
     </div>
   </div>
 </div>
 
 <script>
-// --- Inicialização do mapa e canvas ---
-var map = L.map('map').setView([-22.78,-47.31],10);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{ attribution: 'Tiles © Esri' }).addTo(map);
+// --- Inicialização do mapa ---
+var map = L.map('map', {
+        minZoom: 2,
+        maxZoom: 22
+    }).setView([-22.78,-47.31], 10);
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+        attribution: 'Tiles &copy; Esri &mdash; i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxNativeZoom: 18,
+        maxZoom: 22
+    }).addTo(map);
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -80,7 +237,7 @@ var drawing=false, isDrawing=false, points=[];
 var drawnLayer = new L.FeatureGroup(); map.addLayer(drawnLayer);
 var polygonsCount = 0, maxPolygons = 3, areas = [];
 
-// --- Botões e elementos ---
+// --- Botões ---
 var btnDraw = document.getElementById('btnDraw');
 var btnClear = document.getElementById('btnClear');
 var btnSave = document.getElementById('btnSave');
@@ -92,7 +249,7 @@ var strokeColorInput = document.getElementById('strokeColor');
 var fillColorInput = document.getElementById('fillColor');
 var noFillCheckbox = document.getElementById('noFill');
 var applyBtn = document.getElementById('applyKMLStyle');
-var currentKMLLayer = null;
+var currentLoadedLayer = null;
 var inputLoadKML = document.getElementById('inputLoadKML');
 var btnLoadKML = document.getElementById('btnLoadKML');
 var formatModal = document.getElementById('formatModal');
@@ -105,61 +262,50 @@ var btnGps = document.getElementById('btnGps');
 var btnMenu = document.getElementById('btnMenu');
 var dropdownMenu = document.getElementById('dropdownMenu');
 btnMenu.onclick = function() {
-    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    dropdownMenu.classList.toggle('show');
 };
 document.addEventListener('click', function(e){
     if(!dropdownMenu.contains(e.target) && e.target !== btnMenu){
-        dropdownMenu.style.display = 'none';
+        dropdownMenu.classList.remove('show');
     }
     if(!kmlConfigPanel.contains(e.target) && e.target !== btnKMLConfig){
         kmlConfigPanel.style.display = 'none';
     }
 });
 
-// --- Funções desenho ---
+// --- Desenho ---
 btnDraw.onclick = function() {
-    dropdownMenu.style.display = 'none';
+    dropdownMenu.classList.remove('show');
+    kmlConfigPanel.style.display = 'none';
     drawing = !drawing;
-    canvas.style.pointerEvents = drawing?'auto':'none';
+    canvas.style.pointerEvents = drawing ? 'auto' : 'none';
+    
     if(drawing){
         map.dragging.disable(); map.touchZoom.disable(); map.scrollWheelZoom.disable();
-        btnDraw.textContent='🖐️ Mover mapa';
-        
-    }else{
+        btnDraw.textContent = '🖐️ Mover mapa';
+    } else {
         map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable();
-        btnDraw.textContent='✏️ Desenhar';
-        
+        btnDraw.textContent = '✏️ Desenhar';
     }
 };
+
 btnClear.onclick = function(){
-    if (window.ReactNativeWebView) {
-        // AVISA O APP PARA TENTAR MOSTRAR UM ANÚNCIO
-        window.ReactNativeWebView.postMessage('ATTEMPT_SHOW_AD');
-    }
     drawnLayer.clearLayers();
     ctx.clearRect(0,0,canvas.width,canvas.height);
     info.textContent="Área: 0 ha";
     polygonsCount = 0;
     areas = [];
-    dropdownMenu.style.display = 'none';
-};
-btnSave.onclick = function() {
-    if(drawnLayer.getLayers().length === 0){ alert("Nenhum desenho para salvar!"); return; }
-    if (window.ReactNativeWebView) {
-        // AVISA O APP PARA TENTAR MOSTRAR UM ANÚNCIO
-        window.ReactNativeWebView.postMessage('ATTEMPT_SHOW_AD');
-    }
-    formatModal.style.display = 'flex';
+    dropdownMenu.classList.remove('show');
 };
 
-// --- Eventos do desenho ---
+// --- Eventos de desenho ---
 function getPoint(e){ return e.touches ? [e.touches[0].clientX,e.touches[0].clientY] : [e.clientX,e.clientY]; }
 function startDrawing(e){ if(!drawing) return; isDrawing=true; points=[]; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.beginPath(); const [x,y]=getPoint(e); points.push([x,y]); ctx.moveTo(x,y); e.preventDefault(); }
 function draw(e){ if(!drawing || !isDrawing) return; const [x,y]=getPoint(e); ctx.lineTo(x,y); ctx.strokeStyle='red'; ctx.lineWidth=2; ctx.stroke(); points.push([x,y]); e.preventDefault(); }
 function endDrawing(e){
     if(!drawing || !isDrawing) return;
     isDrawing=false; if(points.length<3) return;
-    if(polygonsCount >= maxPolygons){ alert("ATENÇÃO!\nMáximo de 3 polígonos"); ctx.clearRect(0,0,canvas.width,canvas.height); points=[]; drawing=false; canvas.style.pointerEvents='none'; map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); btnDraw.textContent='✏️ Desenhar'; return; }
+    if(polygonsCount >= maxPolygons){ customAlert("Máximo de 3 polígonos atingido."); ctx.clearRect(0,0,canvas.width,canvas.height); points=[]; drawing=false; canvas.style.pointerEvents='none'; map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); btnDraw.textContent='✏️ Desenhar'; return; }
     const latlngs = points.map(pt=>map.containerPointToLatLng(L.point(pt[0],pt[1])));
     const polygon = L.polygon(latlngs,{color:'red', fillOpacity:0.5}).addTo(drawnLayer);
     const area = turf.area(polygon.toGeoJSON());
@@ -167,7 +313,7 @@ function endDrawing(e){
     polygonsCount++; areas.push(areaHa);
     let infoText = "Polígonos desenhados: " + polygonsCount + "<br>";
     areas.forEach((a,i)=>{ infoText += "Polígono " + (i+1) + ": " + a + " ha<br>"; });
-    infoText += "Área total: " + areas.reduce((sum, a) => sum + parseFloat(a), 0).toFixed(2) + " ha";
+    infoText += "<b>Área total: " + areas.reduce((sum, a) => sum + parseFloat(a), 0).toFixed(2) + " ha</b>";
     info.innerHTML = infoText;
     ctx.clearRect(0,0,canvas.width,canvas.height); points=[]; drawing = false; canvas.style.pointerEvents='none'; map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); btnDraw.textContent='✏️ Desenhar';
 }
@@ -179,66 +325,178 @@ document.addEventListener('mouseup', endDrawing);
 document.addEventListener('touchend', endDrawing);
 window.addEventListener('resize',function(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
 
-// --- KML ---
+// --- Carregar Arquivos (KML/GeoJSON) ---
 btnLoadKML.addEventListener('click', function() { inputLoadKML.click(); });
 inputLoadKML.addEventListener('change', function(event){
     var file = event.target.files[0]; if(!file) return;
     var reader = new FileReader();
     reader.onload = function(e){
         var text = e.target.result;
-        if(currentKMLLayer) map.removeLayer(currentKMLLayer);
+        if(currentLoadedLayer) map.removeLayer(currentLoadedLayer);
         var filename = file.name.toLowerCase();
-        if(filename.endsWith('.kml')) { currentKMLLayer = omnivore.kml.parse(text).addTo(map); }
+        if(filename.endsWith('.kml')) { currentLoadedLayer = omnivore.kml.parse(text).addTo(map); }
         else if(filename.endsWith('.geojson') || filename.endsWith('.json')) {
             var geojsonData = JSON.parse(text);
-            currentKMLLayer = L.geoJSON(geojsonData, { style: { color: strokeColorInput.value, fillColor: fillColorInput.value, fillOpacity: 0.5 } }).addTo(map);
-        } else { alert("Formato não suportado. Use KML ou GeoJSON."); return; }
-        map.fitBounds(currentKMLLayer.getBounds());
+            currentLoadedLayer = L.geoJSON(geojsonData, { style: { color: strokeColorInput.value, fillColor: fillColorInput.value, fillOpacity: 0.5 } }).addTo(map);
+        } else { customAlert("Formato não suportado. Use KML ou GeoJSON."); return; }
+        map.fitBounds(currentLoadedLayer.getBounds());
         btnKMLConfig.style.display = "block";
     };
     reader.readAsText(file);
+    inputLoadKML.value = ''; // Limpa o input para permitir carregar o mesmo arquivo novamente
 });
+
 btnKMLConfig.onclick = function(){ kmlConfigPanel.style.display = kmlConfigPanel.style.display==='block'?'none':'block'; };
 applyBtn.onclick = function(){
-    if(!currentKMLLayer) return;
+    if(!currentLoadedLayer) return;
     var strokeColor = strokeColorInput.value;
     var fillColor = noFillCheckbox.checked ? 'transparent' : fillColorInput.value;
-    currentKMLLayer.eachLayer(function(layer){
+    currentLoadedLayer.eachLayer(function(layer){
         if(layer.setStyle){ layer.setStyle({ color: strokeColor, fillColor: fillColor, fillOpacity: noFillCheckbox.checked ? 0 : 0.5 }); }
     });
-    // Fecha painel ao aplicar
     kmlConfigPanel.style.display = 'none';
 };
-btnDeleteKML.onclick = function(){ if(currentKMLLayer){ map.removeLayer(currentKMLLayer); currentKMLLayer=null; btnKMLConfig.style.display='none'; kmlConfigPanel.style.display='none'; } };
+btnDeleteKML.onclick = function(){ if(currentLoadedLayer){ map.removeLayer(currentLoadedLayer); currentLoadedLayer=null; btnKMLConfig.style.display='none'; kmlConfigPanel.style.display='none'; } };
 
-// --- Modal salvar ---
-formatCancel.onclick = function(){ formatModal.style.display = 'none'; };
-formatOk.onclick = function(){
-    var format = formatSelect.value; formatModal.style.display = 'none';
-    let content="", filename="";
-    if(format==="geojson"){ content=JSON.stringify(drawnLayer.toGeoJSON()); filename="desenho.geojson"; }
-    else if(format==="kml"){
-        let kmlContent='<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="https://www.opengis.net/kml/2.2">\n<Document>\n';
-        drawnLayer.eachLayer(function(layer,index){
-            if(layer instanceof L.Polygon){
-                kmlContent+=`<Placemark>\n<name>Polígono ${index+1}</name>\n<Polygon>\n<outerBoundaryIs>\n<LinearRing>\n<coordinates>\n`;
-                layer.getLatLngs()[0].forEach(function(latlng){ kmlContent+=`${latlng.lng},${latlng.lat},0 `; });
-                kmlContent+=`\n</coordinates>\n</LinearRing>\n</outerBoundaryIs>\n</Polygon>\n</Placemark>\n`;
-            }
-        });
-        kmlContent+='</Document>\n</kml>';
-        content=kmlContent; filename="desenho.kml";
-    } else { alert("Formato não suportado!"); return; }
-    if(window.ReactNativeWebView && window.ReactNativeWebView.postMessage){ window.ReactNativeWebView.postMessage(JSON.stringify({ content, filename })); }
-    else{ alert("Salvamento não suportado neste navegador."); }
+
+// --- Lógica para Salvar ---
+btnSave.onclick = function() {
+    if (drawnLayer.getLayers().length === 0) {
+        customAlert("Não há nada para salvar. Desenhe um polígono primeiro.");
+        return;
+    }
+    dropdownMenu.classList.remove('show');
+    formatModal.style.display = 'flex';
+};
+
+formatCancel.onclick = function() { formatModal.style.display = 'none'; };
+
+formatOk.onclick = function() {
+    var format = formatSelect.value; 
+    formatModal.style.display = 'none';
+    
+    customPrompt("Digite o nome do arquivo:", "area_desenhada", function(fileNameInput){
+        if(!fileNameInput) return; // Se o usuário cancelar
+        
+        let content;
+        let filename;
+        let contentType;
+        
+        switch(format) {
+            case "kml":
+                let kmlContent = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
+                drawnLayer.eachLayer(function(layer,index){
+                    if(layer instanceof L.Polygon){
+                        kmlContent += `<Placemark><name>Polígono ${index+1}</name><Polygon><outerBoundaryIs><LinearRing><coordinates>`;
+                        // Garante que o primeiro e último ponto são iguais para fechar o polígono
+                        const latlngs = layer.getLatLngs()[0];
+                        latlngs.forEach(function(latlng){ kmlContent += `${latlng.lng},${latlng.lat},0 `; });
+                        kmlContent += `${latlngs[0].lng},${latlngs[0].lat},0 `; // Repete o primeiro ponto
+                        kmlContent += `</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`;
+                    }
+                });
+                kmlContent += '</Document></kml>';
+                content = kmlContent;
+                filename = fileNameInput;
+                contentType = 'application/vnd.google-earth.kml+xml';
+                break;
+                
+            case "geojson":
+                const geojsonData = drawnLayer.toGeoJSON();
+                content = JSON.stringify(geojsonData, null, 2); // O 2 é para identação
+                filename = fileNameInput ;
+                contentType = 'application/json';
+                break;
+                
+            case "csv":
+                let csvContent = 'ID_Poligono,ID_Ponto,Latitude,Longitude\n';
+                drawnLayer.eachLayer(function(layer, layerIndex){
+                    if(layer instanceof L.Polygon){
+                        const latlngs = layer.getLatLngs()[0];
+                        latlngs.forEach(function(latlng, pointIndex){
+                            csvContent += `${layerIndex+1},${pointIndex+1},${latlng.lat.toFixed(6)},${latlng.lng.toFixed(6)}\n`;
+                        });
+                    }
+                });
+                content = csvContent;
+                filename = fileNameInput;
+                contentType = 'text/csv;charset=utf-8;';
+                break;
+        }
+        
+        download(content, filename, contentType);
+    });
 };
 
 // --- GPS ---
 btnGps.onclick = function() {
-    if(window.ReactNativeWebView && window.ReactNativeWebView.postMessage){
+    // Verifica se está no WebView do React Native
+    if (window.ReactNativeWebView) {
+        // Pede a localização para o React Native
         window.ReactNativeWebView.postMessage('GET_LOCATION');
+    } else {
+        // Comportamento padrão para navegador web
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+                map.setView([lat, lon], 15);
+                L.marker([lat, lon]).addTo(map).bindPopup("Você está aqui!").openPopup();
+            }, function() {
+                customAlert("Não foi possível obter sua localização.");
+            });
+        } else {
+            customAlert("Geolocalização não é suportada por este navegador.");
+        }
     }
 };
+
+// --- Funções Utilitárias ---
+function customAlert(message, callback) {
+    const modal = document.createElement('div');
+    modal.className = 'custom-modal';
+    modal.innerHTML = `<div class="custom-modal-content"><div>${message}</div><button id="okBtn">OK</button></div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('#okBtn').onclick = function() { document.body.removeChild(modal); if(callback) callback(); };
+}
+
+function customPrompt(message, defaultValue, callback) {
+    const modal = document.createElement('div');
+    modal.className = 'custom-modal';
+    modal.innerHTML = `
+        <div class="custom-modal-content">
+            <div>${message}</div>
+            <input type="text" id="promptInput" value="${defaultValue||''}" />
+            <div>
+                <button id="cancelBtn">Cancelar</button>
+                <button id="okBtn">OK</button>
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+    const input = modal.querySelector('#promptInput');
+    modal.querySelector('#okBtn').onclick = function(){ document.body.removeChild(modal); callback(input.value); };
+    modal.querySelector('#cancelBtn').onclick = function(){ document.body.removeChild(modal); callback(null); };
+    input.focus();
+}
+
+function download(content, filename, contentType) {
+    // Verifica se está rodando dentro de um WebView do React Native
+    if (window.ReactNativeWebView) {
+        // Envia os dados para o React Native em formato de string JSON
+        const message = JSON.stringify({ content: content, filename: filename, contentType: contentType });
+        window.ReactNativeWebView.postMessage(message);
+    } else {
+        // Comportamento padrão para navegador web
+        const a = document.createElement('a');
+        const file = new Blob([content], {type: contentType});
+        a.href = URL.createObjectURL(file);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        customAlert('Download iniciado no navegador.');
+    }
+}
 </script>
 </body>
 </html>
+
