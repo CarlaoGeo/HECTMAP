@@ -2,7 +2,6 @@
 #  Configurações do Site
 # ---------------- #
 
-# Título e Descrição (Aparecem no cabeçalho do site e nos resultados de busca)
 # Título e Descrição
 title: HECTMAP
 description: Calcule áreas de terrenos e polígonos georreferenciados com precisão.
@@ -18,30 +17,28 @@ theme: jekyll-theme-minimal
 #  Informações do Projeto
 # ---------------- #
 
-# Logo (O caminho continua o mesmo)
+# Logo
 logo: /assets/logo.png
 
-# Botões de Download (Mostra links para baixar o repositório como .zip ou .tar.gz)
+# Botões de Download
 show_downloads: false
 
 # ---------------- #
 #  Conteúdo e Metadados
 # ---------------- #
 
-# Informações de Contato (Podem ser usadas em outras páginas do site)
+# Informações de Contato
 author:
   name: HECTMAP
   email: carlosedulc17077@gmail.com
 
-# Google Analytics (Opcional: adicione seu ID de rastreamento para analisar o tráfego)
+# Google Analytics (Opcional)
 # google_analytics: UA-XXXXXXXXX-X
 
 # ---------------- #
 #  Plugins do Jekyll
 # ---------------- #
 
-# Plugins para otimizar o site (SEO, Sitemaps, etc.)
-# Adicione os gems à sua Gemfile se estiver rodando localmente.
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
@@ -51,7 +48,6 @@ plugins:
 # ---------------- #
 
 # Excluir arquivos da construção do site
-# O README.md já é usado como página inicial por muitos temas, então não é necessário excluí-lo.
 exclude:
   - Gemfile
   - Gemfile.lock
