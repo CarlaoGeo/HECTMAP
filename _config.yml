@@ -14,7 +14,7 @@ theme: jekyll-theme-minimal
 # ---------------- #
 
 # Logo (Opcional: descomente a linha e adicione o caminho se tiver uma imagem de logo)
-# logo: /assets/img/logo.png
+logo: /assets/logo.png
 
 # Botões de Download (Mostra links para baixar o repositório como .zip ou .tar.gz)
 show_downloads: false
