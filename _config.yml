@@ -3,18 +3,23 @@
 # ---------------- #
 
 # Título e Descrição (Aparecem no cabeçalho do site e nos resultados de busca)
+# Título e Descrição
 title: HECTMAP
 description: Calcule áreas de terrenos e polígonos georreferenciados com precisão.
 
-# Tema Visual (Um tema limpo e moderno, ótimo para projetos)
+# URL e BaseURL (ESSENCIAL para o logo e links funcionarem)
+url: "https://CarlaoGeo.github.io" # Substitua CarlaoGeo pelo seu usuário
+baseurl: "/HECTMAP" # O nome do seu repositório, com a barra na frente
+
+# Tema Visual
 theme: jekyll-theme-minimal
 
 # ---------------- #
 #  Informações do Projeto
 # ---------------- #
 
-# Logo (Opcional: descomente a linha e adicione o caminho se tiver uma imagem de logo)
-logo: /HECTMAP/assets/logo.png
+# Logo (O caminho continua o mesmo)
+logo: /assets/logo.png
 
 # Botões de Download (Mostra links para baixar o repositório como .zip ou .tar.gz)
 show_downloads: false
