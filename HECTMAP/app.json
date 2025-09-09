@@ -2,45 +2,45 @@
   "expo": {
     "name": "HECTMAP",
     "slug": "HECTMAP",
-    "version": "1.1.0",
+    "version": "1.2.0",
+    "scheme": "com.carlaogeo.hectmap",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "updates": {
+      "url": "https://u.expo.dev/ac44dadb-180a-437d-882b-5c7b5c4e9c48"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "plugins": [
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713"
         }
-      ]
+      ],
+      "expo-dev-client",
+      "expo-updates"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.carlaogeo.HECTMAP"
+      "bundleIdentifier": "com.carlaogeo.hectmap"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo_1024_1024.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.carlaogeo.HECTMAP"
+      "package": "com.carlaogeo.hectmap"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "owner": "carlaogeo",
-    "runtimeVersion": "1.1.0",
-    "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/ac44dadb-180a-437d-882b-5c7b5c4e9c48"
     },
     "extra": {
       "eas": {
