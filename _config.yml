@@ -1,0 +1,54 @@
+# ---------------- #
+#  Configurações do Site
+# ---------------- #
+
+# Título e Descrição
+title: HECTMAP
+description: Calcule áreas de terrenos e polígonos georreferenciados com precisão.
+
+# URL e BaseURL (ESSENCIAL para o logo e links funcionarem)
+url: "https://CarlaoGeo.github.io" # Substitua CarlaoGeo pelo seu usuário
+baseurl: "/HECTMAP" # O nome do seu repositório, com a barra na frente
+
+# Tema Visual
+theme: jekyll-theme-minimal
+
+# ---------------- #
+#  Informações do Projeto
+# ---------------- #
+
+# Logo
+logo: /assets/logo.png
+
+# Botões de Download
+show_downloads: false
+
+# ---------------- #
+#  Conteúdo e Metadados
+# ---------------- #
+
+# Informações de Contato
+author:
+  name: HECTMAP
+  email: carlosedulc17077@gmail.com
+
+# Google Analytics (Opcional)
+# google_analytics: UA-XXXXXXXXX-X
+
+# ---------------- #
+#  Plugins do Jekyll
+# ---------------- #
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# ---------------- #
+#  Configurações Avançadas
+# ---------------- #
+
+# Excluir arquivos da construção do site
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
